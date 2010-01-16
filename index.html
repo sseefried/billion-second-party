@@ -1,0 +1,103 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title></title>
+<script type="text/javascript" src="date.js"></script>
+<script type="text/javascript" src="jquery-1.3.2.min.js"></script>
+<script type="text/javascript" src="raphael-min.js"></script>
+</head>
+
+<body>
+<script>
+
+  var MAX = 1000000000;
+
+/*  var INIT = 999999980;
+  function secondsAlive() {
+    INIT = INIT + 1;
+    return INIT;
+  }   */
+
+  function secondsAlive() {
+    return Math.round((Date.now() - Date.parse("11 May 1978 15:00:00"))/1000);
+  }      
+
+  var t;
+  var N = 9;
+
+  var cs = new Array(N);
+  var a = 0;
+
+  var pi = 3.14159;
+
+  var FONT_SIZE = 128;
+
+  var TEXT_ATTR = { font: "Helvetica", "font-size": FONT_SIZE};
+
+  var RAD = 200;
+  var INTERVAL = 1000;
+  var WIDTH = 1400;
+  var HEIGHT = 800;
+  var CENTER_X = WIDTH/2 - FONT_SIZE/2;
+  var CENTER_Y = HEIGHT/2 - FONT_SIZE/2; 
+
+  var first;
+
+  function rotateCircle() {
+    first.animate({ x: CENTER_X, y: CENTER_Y, fill: Raphael.getColor() }, INTERVAL);  
+    var i;
+    for (i=0; i < N; i = i + 1) {
+       cs[(i+a)%N].animate({x: CENTER_X + RAD * Math.cos(i * (2*pi/N)),
+                            y: CENTER_Y + RAD * Math.sin(i * (2*pi/N)),
+                            fill: Raphael.getColor()
+                           }, INTERVAL);
+    }
+    a = a + 1;
+  }
+
+  function moveFirst() {
+
+  }
+
+  var intervalID;
+  var counter;
+
+  var r;
+
+  function increment() {
+     s = secondsAlive();
+     if (s < MAX) {
+       counter.attr({ text: s });
+     } else {
+        clearInterval(intervalID);
+        counter.hide();
+        var start = (WIDTH-6*FONT_SIZE)/2;
+        first = r.text(start,CENTER_Y, "1");
+        first.attr(TEXT_ATTR);
+    
+        for (i = 0; i < N; i = i + 1) {
+          cs[i] = r.text((FONT_SIZE/2+FONT_SIZE/16)*(i+1)+start,CENTER_Y, "0");
+          cs[i].attr(TEXT_ATTR);
+        }
+      
+        setInterval("rotateCircle()", INTERVAL);
+
+     }
+  }
+
+  $(document).ready(function () {
+    $('#counter').html();
+    r = Raphael("canvas", WIDTH, HEIGHT);
+    counter = r.text(CENTER_X, CENTER_Y, "");
+    counter.attr(TEXT_ATTR);
+    intervalID = setInterval("increment()", 500);
+
+}); 
+
+
+</script>
+
+
+<div id="canvas"></div>
+
+
+</body> </html>
