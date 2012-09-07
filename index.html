@@ -11,15 +11,18 @@
 
   var MAX = 1000000000;
 
-/*  var INIT = 999999980;
-  function secondsAlive() {
-    INIT = INIT + 1;
-    return INIT;
-  }   */
+  function getUrlVars() {
+      var vars = {};
+      var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+          vars[key] = value;
+      });
+      return vars;
+  }
 
-  function secondsAlive() {
-    return Math.round((Date.now() - Date.parse("11 May 1978 15:00:00"))/1000);
-  }      
+
+  function secondsAlive(date_str) {
+    return Math.round((Date.now() - Date.parse(date_str))/1000);
+  }
 
   var t;
   var N = 9;
@@ -38,12 +41,12 @@
   var WIDTH = 1400;
   var HEIGHT = 800;
   var CENTER_X = WIDTH/2 - FONT_SIZE/2;
-  var CENTER_Y = HEIGHT/2 - FONT_SIZE/2; 
+  var CENTER_Y = HEIGHT/2 - FONT_SIZE/2;
 
   var first;
 
   function rotateCircle() {
-    first.animate({ x: CENTER_X, y: CENTER_Y, fill: Raphael.getColor() }, INTERVAL);  
+    first.animate({ x: CENTER_X, y: CENTER_Y, fill: Raphael.getColor() }, INTERVAL);
     var i;
     for (i=0; i < N; i = i + 1) {
        cs[(i+a)%N].animate({x: CENTER_X + RAD * Math.cos(i * (2*pi/N)),
@@ -63,35 +66,37 @@
 
   var r;
 
-  function increment() {
-     s = secondsAlive();
-     if (s < MAX) {
-       counter.attr({ text: s });
-     } else {
+  function increment(date_str) {
+    return function() {
+      s = secondsAlive(date_str);
+      if (s < MAX) {
+        counter.attr({ text: s });
+      } else {
         clearInterval(intervalID);
         counter.hide();
         var start = (WIDTH-6*FONT_SIZE)/2;
         first = r.text(start,CENTER_Y, "1");
         first.attr(TEXT_ATTR);
-    
+
         for (i = 0; i < N; i = i + 1) {
           cs[i] = r.text((FONT_SIZE/2+FONT_SIZE/16)*(i+1)+start,CENTER_Y, "0");
           cs[i].attr(TEXT_ATTR);
         }
-      
         setInterval("rotateCircle()", INTERVAL);
-
-     }
+      }
+    };
   }
 
   $(document).ready(function () {
+    var url_vars = getUrlVars();
+    var date_str = unescape(url_vars.date || "1 January 1986 00:00");
+    console.log(date_str);
     $('#counter').html();
     r = Raphael("canvas", WIDTH, HEIGHT);
     counter = r.text(CENTER_X, CENTER_Y, "");
     counter.attr(TEXT_ATTR);
-    intervalID = setInterval("increment()", 500);
-
-}); 
+    intervalID = setInterval(increment(date_str), 500);
+});
 
 
 </script>
